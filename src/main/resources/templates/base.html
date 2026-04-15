@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcademiaFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script>
+        (function() {
+            var theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+<body>
+
+<!-- Navbar Fragment -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg sticky-top mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="bi bi-stars"></i> AcademiaFlow
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard"><i class="bi bi-grid-1x2-fill me-1"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/projects"><i class="bi bi-kanban me-1"></i> Projects</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile"><i class="bi bi-person-circle me-1"></i> Profile</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav align-items-center gap-2">
+                <li class="nav-item">
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+                        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                    </button>
+                </li>
+                <li class="nav-item d-flex align-items-center gap-2">
+                    <a href="/profile" class="d-flex align-items-center text-decoration-none">
+                        <div class="avatar-sm me-2" th:text="${session.user != null ? session.user.initial : '?'}">?</div>
+                        <span style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;" th:text="${session.user != null ? session.user.name : 'User'}">User</span>
+                    </a>
+                    <a class="btn btn-outline-danger btn-sm rounded-pill ms-1 px-3" href="/logout" style="font-size: 0.8rem;">
+                        <i class="bi bi-box-arrow-right me-1"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Footer Fragment -->
+<footer th:fragment="footer" style="margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid var(--border); text-align: center;">
+    <div class="container">
+        <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.25rem;">
+            <i class="bi bi-stars me-1" style="color: var(--primary);"></i>
+            <strong style="color: var(--text-secondary);">AcademiaFlow</strong> — Student Project Management System
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 0;">
+            Built with ❤️ by <strong style="color: var(--text-secondary);">Sajal Goyal</strong>
+            <span class="mx-1">•</span>
+            <a href="https://github.com/sajalgoyal007" target="_blank" style="color: var(--primary); text-decoration: none;">
+                <i class="bi bi-github me-1"></i>GitHub
+            </a>
+        </p>
+    </div>
+</footer>
+
+<!-- AI Chat Widget Fragment -->
+<div th:fragment="chatbot">
+    <button id="chatToggleBtn" class="chat-toggle-btn" onclick="toggleChat()">
+        <span id="chatBtnIcon"><i class="bi bi-robot"></i></span>
+    </button>
+
+    <div id="chatWindow" class="chat-window" style="display: none;">
+        <div class="chat-header">
+            <div class="d-flex align-items-center gap-2">
+                <span class="chat-header-icon"><i class="bi bi-robot"></i></span>
+                <div>
+                    <div class="fw-bold" style="font-size: 0.9rem;">AcademiaFlow AI</div>
+                    <div class="chat-status"><i class="bi bi-lightning-charge-fill"></i> Powered by Groq</div>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChat()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <div id="chatMessages" class="chat-messages">
+            <div class="chat-msg bot">
+                <div class="chat-bubble bot">
+                    👋 Hi! I'm your <strong>AcademiaFlow AI Assistant</strong>. I know all about your projects, tasks, and deadlines.
+                    <br><br>
+                    <em style="font-size: 0.8rem; opacity: 0.7;">Try the quick actions below or type your own question!</em>
+                </div>
+            </div>
+            <!-- Quick Action Presets -->
+            <div class="d-flex flex-wrap gap-1 px-1">
+                <button class="filter-btn" onclick="sendPreset('What are my pending tasks?')" style="font-size: 0.72rem;">📋 Pending Tasks</button>
+                <button class="filter-btn" onclick="sendPreset('Give me a summary of all my projects')" style="font-size: 0.72rem;">📊 Summary</button>
+                <button class="filter-btn" onclick="sendPreset('Generate a 7-day study plan for my upcoming exams based on my project topics')" style="font-size: 0.72rem;">📚 Study Plan</button>
+                <button class="filter-btn" onclick="sendPreset('Suggest tasks I should prioritize this week')" style="font-size: 0.72rem;">🎯 Priorities</button>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Ask about your projects..." 
+                   onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="chat-send-btn" onclick="sendMessage()">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const win = document.getElementById('chatWindow');
+            const btn = document.getElementById('chatBtnIcon');
+            if (win.style.display === 'none') {
+                win.style.display = 'flex';
+                btn.innerHTML = '<i class="bi bi-x-lg"></i>';
+                document.getElementById('chatInput').focus();
+            } else {
+                win.style.display = 'none';
+                btn.innerHTML = '<i class="bi bi-robot"></i>';
+            }
+        }
+
+        function sendPreset(text) {
+            document.getElementById('chatInput').value = text;
+            sendMessage();
+        }
+
+        function appendMessage(text, isUser) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg ' + (isUser ? 'user' : 'bot');
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-bubble ' + (isUser ? 'user' : 'bot');
+            if (isUser) {
+                bubble.textContent = text;
+            } else {
+                let html = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code>$1</code>')
+                    .replace(/\n/g, '<br>');
+                html = html.replace(/^- /gm, '• ');
+                bubble.innerHTML = html;
+            }
+            msgDiv.appendChild(bubble);
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTyping() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-msg bot';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<div class="chat-bubble bot typing-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            appendMessage(message, true);
+            input.value = '';
+            input.disabled = true;
+            showTyping();
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                removeTyping();
+                const data = await response.json();
+                appendMessage(data.reply || 'No response received.', false);
+            } catch (error) {
+                removeTyping();
+                appendMessage('⚠️ Connection error. Please try again.', false);
+            }
+            input.disabled = false;
+            input.focus();
+        }
+    </script>
+</div>
+
+<!-- Dark Mode Script Fragment -->
+<th:block th:fragment="theme-script">
+    <script>
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon(next);
+        }
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            updateThemeIcon(localStorage.getItem('theme') || 'light');
+        });
+    </script>
+</th:block>
+
+<!-- Scripts Fragment -->
+<th:block th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</th:block>
+
+</body>
+</html>

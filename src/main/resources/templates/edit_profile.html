@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}">
+    <meta charset="UTF-8">
+    <title>Edit Profile - AcademiaFlow</title>
+</head>
+<body>
+
+<div th:replace="~{base :: navbar}"></div>
+
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <p class="section-label mb-1">Settings</p>
+                    <h2 class="fw-bold" style="font-size: 1.5rem;"><i class="bi bi-pencil-square me-2 text-gradient"></i>Edit Profile</h2>
+                </div>
+                <a href="/profile" class="btn btn-outline-secondary btn-sm px-3"><i class="bi bi-arrow-left me-1"></i> Back</a>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" style="border-radius: var(--radius-md); border: none; background: rgba(239, 68, 68, 0.08); color: #dc2626;">
+                <i class="bi bi-exclamation-circle-fill me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form action="/profile/edit" method="post">
+                <div class="premium-card p-4 mb-4" style="border: none;">
+                    <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-person me-2 text-gradient"></i>Personal Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="name" class="form-control" th:value="${user.name}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email (cannot change)</label>
+                            <input type="email" class="form-control" th:value="${user.email}" disabled style="opacity: 0.6;">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="phone" class="form-control" th:value="${user.phone}" placeholder="+91 9876543210">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card p-4 mb-4" style="border: none;">
+                    <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-mortarboard me-2 text-gradient"></i>Academic Information</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">College</label>
+                            <input type="text" name="college" class="form-control" th:value="${user.college}" placeholder="e.g. MIT Pune">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Branch</label>
+                            <input type="text" name="branch" class="form-control" th:value="${user.branch}" placeholder="Computer Science">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Year</label>
+                            <select name="year" class="form-select">
+                                <option value="">--</option>
+                                <option value="1st" th:selected="${user.year == '1st'}">1st</option>
+                                <option value="2nd" th:selected="${user.year == '2nd'}">2nd</option>
+                                <option value="3rd" th:selected="${user.year == '3rd'}">3rd</option>
+                                <option value="4th" th:selected="${user.year == '4th'}">4th</option>
+                                <option value="5th" th:selected="${user.year == '5th'}">5th</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card p-4 mb-4" style="border: none;">
+                    <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-lightbulb me-2 text-gradient"></i>Skills & Interests</h5>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Skills (comma separated)</label>
+                            <input type="text" name="skills" class="form-control" th:value="${user.skills}" placeholder="Java, Python, Spring Boot, React">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Interests (comma separated)</label>
+                            <input type="text" name="interests" class="form-control" th:value="${user.interests}" placeholder="Web Development, Machine Learning">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="premium-card p-4 mb-4" style="border: none;">
+                    <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-journal-text me-2 text-gradient"></i>Bio</h5>
+                    <textarea name="bio" class="form-control" rows="4" placeholder="Tell us about yourself..." th:text="${user.bio}"></textarea>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-primary px-5 py-2"><i class="bi bi-check2 me-1"></i> Save Changes</button>
+                    <a href="/profile" class="btn btn-outline-secondary px-4 py-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: footer}"></div>
+
+<div th:replace="~{base :: chatbot}"></div>
+<div th:replace="~{base :: theme-script}"></div>
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

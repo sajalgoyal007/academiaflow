@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}">
+    <meta charset="UTF-8">
+    <title>Profile - AcademiaFlow</title>
+</head>
+<body>
+
+<div th:replace="~{base :: navbar}"></div>
+
+<div class="container py-3">
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" style="border-radius: var(--radius-md); border: none; background: rgba(16, 185, 129, 0.08); color: #059669;">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Left - Profile Card -->
+        <div class="col-md-4">
+            <div class="premium-card p-4 text-center" style="border: none;">
+                <div class="avatar-lg mx-auto mb-3" th:text="${user.initial}">?</div>
+                <h4 class="fw-bold mb-1" style="font-size: 1.2rem;" th:text="${user.name}">Name</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem;" class="mb-3" th:text="${user.email}">email</p>
+                
+                <div class="d-flex justify-content-center gap-2 mb-2" th:if="${user.college != null}">
+                    <span class="tag tag-primary" th:text="${user.college}">College</span>
+                </div>
+                <div class="d-flex justify-content-center gap-2 mb-3" th:if="${user.branch != null}">
+                    <span class="tag tag-success" th:text="${user.branch + (user.year != null ? ' • ' + user.year + ' Year' : '')}">Branch</span>
+                </div>
+
+                <div class="divider"></div>
+                <div class="d-grid gap-2">
+                    <a href="/profile/edit" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i>Edit Profile</a>
+                    <a href="/profile/change-password" class="btn btn-outline-secondary"><i class="bi bi-shield-lock me-2"></i>Change Password</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right - Details -->
+        <div class="col-md-8">
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3 animate-in">
+                    <div class="premium-card p-3 text-center stat-card stat-purple" style="border: none;">
+                        <div class="stat-value" style="font-size: 1.4rem;" th:text="${totalProjects}">0</div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Projects</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 animate-in">
+                    <div class="premium-card p-3 text-center stat-card stat-blue" style="border: none;">
+                        <div class="stat-value" style="font-size: 1.4rem;" th:text="${totalTasks}">0</div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Tasks</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 animate-in">
+                    <div class="premium-card p-3 text-center stat-card stat-green" style="border: none;">
+                        <div class="stat-value" style="font-size: 1.4rem;" th:text="${completedTasks}">0</div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Done</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3 animate-in">
+                    <div class="premium-card p-3 text-center stat-card stat-amber" style="border: none;">
+                        <div class="stat-value" style="font-size: 1.4rem;" th:text="${pendingTasks}">0</div>
+                        <div style="color: var(--text-muted); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Pending</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div class="premium-card p-4 mb-4" style="border: none;">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-journal-text me-2 text-gradient"></i>About Me</h5>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;" th:if="${user.bio != null and !user.bio.isEmpty()}" th:text="${user.bio}">Bio</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;" class="fst-italic" th:if="${user.bio == null or user.bio.isEmpty()}">No bio yet. <a href="/profile/edit" class="text-gradient">Add one →</a></p>
+            </div>
+
+            <!-- Personal -->
+            <div class="premium-card p-4 mb-4" style="border: none;">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-person-vcard me-2 text-gradient"></i>Personal Details</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">Full Name</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${user.name}">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">Email</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${user.email}">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">Phone</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${user.phone != null ? user.phone : 'Not provided'}">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">Member Since</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${#temporals.format(user.createdAt, 'MMMM dd, yyyy')}">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic -->
+            <div class="premium-card p-4 mb-4" style="border: none;">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-mortarboard me-2 text-gradient"></i>Academic Details</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">College</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${user.college != null ? user.college : 'Not provided'}">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">Branch</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${user.branch != null ? user.branch : 'Not provided'}">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3" style="background: var(--bg-secondary); border-radius: var(--radius-md);">
+                            <div class="section-label mb-1">Year</div>
+                            <div class="fw-bold" style="font-size: 0.9rem;" th:text="${user.year != null ? user.year : 'Not provided'}">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills & Interests -->
+            <div class="premium-card p-4" style="border: none;">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;"><i class="bi bi-lightbulb me-2 text-gradient"></i>Skills & Interests</h5>
+                <div class="mb-3">
+                    <div class="section-label">Skills</div>
+                    <div th:if="${user.skills != null and !user.skills.isEmpty()}">
+                        <span th:each="skill : ${user.skills.split(',')}" class="tag tag-primary me-1 mb-1" th:text="${skill.trim()}">Skill</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;" class="fst-italic" th:if="${user.skills == null or user.skills.isEmpty()}">No skills added yet.</p>
+                </div>
+                <div>
+                    <div class="section-label">Interests</div>
+                    <div th:if="${user.interests != null and !user.interests.isEmpty()}">
+                        <span th:each="interest : ${user.interests.split(',')}" class="tag tag-success me-1 mb-1" th:text="${interest.trim()}">Interest</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;" class="fst-italic" th:if="${user.interests == null or user.interests.isEmpty()}">No interests added yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: footer}"></div>
+
+<div th:replace="~{base :: chatbot}"></div>
+<div th:replace="~{base :: theme-script}"></div>
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

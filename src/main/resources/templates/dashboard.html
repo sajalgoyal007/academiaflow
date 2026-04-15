@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}">
+    <meta charset="UTF-8">
+    <title>Dashboard - AcademiaFlow</title>
+</head>
+<body>
+
+<div th:replace="~{base :: navbar}"></div>
+
+<div class="container py-3">
+    <!-- Welcome Banner -->
+    <div class="premium-card p-4 mb-4" style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.06)); border:none;">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <p class="section-label mb-1">Welcome back</p>
+                <h2 class="fw-bold mb-1" style="font-size: 1.6rem;">
+                    <span th:text="${user.name}">User</span> <span style="font-size: 1.4rem;">👋</span>
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Here's an overview of your workspace today.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/report/download" class="btn btn-outline-primary px-3 py-2">
+                    <i class="bi bi-download me-1"></i> Export Report
+                </a>
+                <a href="/projects" class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-plus-lg me-1"></i> New Project
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid - Bento Style -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6 animate-in">
+            <div class="premium-card stat-card stat-purple p-4" style="border: none;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="stat-icon purple"><i class="bi bi-kanban" style="color: #6366f1;"></i></div>
+                </div>
+                <div class="stat-value" th:text="${totalProjects}">0</div>
+                <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Projects</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 animate-in">
+            <div class="premium-card stat-card stat-blue p-4" style="border: none;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="stat-icon blue"><i class="bi bi-list-task" style="color: #3b82f6;"></i></div>
+                </div>
+                <div class="stat-value" th:text="${totalTasks}">0</div>
+                <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Total Tasks</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 animate-in">
+            <div class="premium-card stat-card stat-green p-4" style="border: none;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="stat-icon green"><i class="bi bi-check-circle" style="color: #10b981;"></i></div>
+                </div>
+                <div class="stat-value" th:text="${completedTasks}">0</div>
+                <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Completed</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 animate-in">
+            <div class="premium-card stat-card stat-amber p-4" style="border: none;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="stat-icon amber"><i class="bi bi-clock-history" style="color: #f59e0b;"></i></div>
+                </div>
+                <div class="stat-value" th:text="${pendingTasks}">0</div>
+                <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px;">Pending</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+        <!-- Daily Productivity Score -->
+        <div class="col-md-4">
+            <div class="premium-card p-4 h-100" style="border: none;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-fire text-gradient" style="font-size: 1.2rem;"></i>
+                    <h5 class="fw-bold mb-0" style="font-size: 1rem;">Productivity Score</h5>
+                </div>
+                
+                <div class="text-center mb-3">
+                    <!-- Circular Progress Indicator -->
+                    <div style="position: relative; display: inline-block; width: 120px; height: 120px;">
+                        <svg viewBox="0 0 120 120" style="transform: rotate(-90deg);">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="8"/>
+                            <circle cx="60" cy="60" r="50" fill="none" 
+                                    stroke="url(#gradient)" stroke-width="8" 
+                                    stroke-linecap="round"
+                                    stroke-dasharray="314"
+                                    th:attr="stroke-dashoffset=${314 - (productivityScore * 314 / 100)}"
+                                    style="transition: stroke-dashoffset 1.5s ease-out;"/>
+                            <defs>
+                                <linearGradient id="gradient">
+                                    <stop offset="0%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#8b5cf6"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 1.8rem; font-weight: 800;" class="text-gradient" th:text="${productivityScore} + '%'">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-around" style="font-size: 0.78rem;">
+                    <div class="text-center">
+                        <div style="color: var(--text-muted);">Done Today</div>
+                        <div class="fw-bold" th:text="${completedToday}">0</div>
+                    </div>
+                    <div class="text-center">
+                        <div style="color: var(--text-muted);">Created Today</div>
+                        <div class="fw-bold" th:text="${createdToday}">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="col-md-4">
+            <div class="premium-card p-4 h-100" style="border: none;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-graph-up-arrow text-gradient" style="font-size: 1.2rem;"></i>
+                    <h5 class="fw-bold mb-0" style="font-size: 1rem;">Completion Rate</h5>
+                </div>
+                <div th:if="${totalTasks > 0}">
+                    <div class="text-center mb-3">
+                        <div style="font-size: 2.5rem; font-weight: 800;" class="text-gradient" th:text="${totalTasks > 0 ? (completedTasks * 100 / totalTasks) + '%' : '0%'}">0%</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Overall Completion</div>
+                    </div>
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div class="progress-bar" role="progressbar" 
+                             th:style="'width: ' + ${totalTasks > 0 ? (completedTasks * 100 / totalTasks) : 0} + '%'"></div>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size: 0.78rem; color: var(--text-muted);">
+                        <span><i class="bi bi-check-circle-fill text-success me-1"></i> <span th:text="${completedTasks}">0</span> done</span>
+                        <span><i class="bi bi-clock text-warning me-1"></i> <span th:text="${pendingTasks}">0</span> remaining</span>
+                    </div>
+                </div>
+                <div th:if="${totalTasks == 0}" class="empty-state" style="padding: 2rem 1rem;">
+                    <div class="empty-state-icon" style="font-size: 2rem;">📊</div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;" class="mb-0">Create a project to see stats!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="col-md-4">
+            <div class="premium-card p-4 h-100" style="border: none;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-bell-fill text-gradient" style="font-size: 1.2rem;"></i>
+                    <h5 class="fw-bold mb-0" style="font-size: 1rem;">Notifications</h5>
+                </div>
+                <div th:if="${totalProjects > 0}">
+                    <div class="d-flex align-items-start gap-2 p-2 rounded mb-2" style="background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.12);">
+                        <i class="bi bi-info-circle-fill text-success mt-1" style="font-size: 0.85rem;"></i>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);"><strong th:text="${totalProjects}">0</strong> active project(s)</span>
+                    </div>
+                    <div th:if="${pendingTasks > 0}" class="d-flex align-items-start gap-2 p-2 rounded mb-2" style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.12);">
+                        <i class="bi bi-exclamation-triangle-fill text-warning mt-1" style="font-size: 0.85rem;"></i>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);"><strong th:text="${pendingTasks}">0</strong> task(s) need attention</span>
+                    </div>
+                    <div th:if="${completedTasks > 0}" class="d-flex align-items-start gap-2 p-2 rounded mb-2" style="background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.12);">
+                        <i class="bi bi-trophy-fill mt-1" style="font-size: 0.85rem; color: var(--primary);"></i>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);"><strong th:text="${completedTasks}">0</strong> task(s) completed!</span>
+                    </div>
+                    <div th:if="${completedToday > 0}" class="d-flex align-items-start gap-2 p-2 rounded" style="background: rgba(139, 92, 246, 0.06); border: 1px solid rgba(139, 92, 246, 0.12);">
+                        <i class="bi bi-fire mt-1" style="font-size: 0.85rem; color: #8b5cf6;"></i>
+                        <span style="font-size: 0.82rem; color: var(--text-secondary);"><strong th:text="${completedToday}">0</strong> completed today — great work!</span>
+                    </div>
+                </div>
+                <div th:if="${totalProjects == 0}" class="empty-state" style="padding: 2rem 1rem;">
+                    <div class="empty-state-icon" style="font-size: 2rem;">🔔</div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;" class="mb-0">No notifications yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row g-4 mt-2">
+        <div class="col-md-12">
+            <div class="premium-card p-4" style="border: none;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-lightning-charge-fill text-gradient" style="font-size: 1.2rem;"></i>
+                    <h5 class="fw-bold mb-0" style="font-size: 1rem;">Quick Actions</h5>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/projects" class="btn btn-outline-primary btn-sm px-3 py-2">
+                        <i class="bi bi-plus-circle me-1"></i> New Project
+                    </a>
+                    <a href="/projects" class="btn btn-outline-primary btn-sm px-3 py-2">
+                        <i class="bi bi-kanban me-1"></i> Manage Projects
+                    </a>
+                    <a href="/profile" class="btn btn-outline-primary btn-sm px-3 py-2">
+                        <i class="bi bi-person-gear me-1"></i> View Profile
+                    </a>
+                    <a href="/profile/edit" class="btn btn-outline-primary btn-sm px-3 py-2">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Profile
+                    </a>
+                    <a href="/report/download" class="btn btn-outline-primary btn-sm px-3 py-2">
+                        <i class="bi bi-file-earmark-text me-1"></i> Download Report
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="~{base :: footer}"></div>
+
+<div th:replace="~{base :: chatbot}"></div>
+<div th:replace="~{base :: theme-script}"></div>
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>
